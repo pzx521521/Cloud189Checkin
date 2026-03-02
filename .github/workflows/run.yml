@@ -8,6 +8,10 @@ on:
   workflow_dispatch:
   schedule:
     - cron: 55 3 * * *
+    # 显式声明权限，确保可以删除运行记录和更新仓库活跃度
+permissions:
+  contents: write
+  actions: write
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -66,3 +70,10 @@ jobs:
           repository: ${{ github.repository }}
           retain_days: 0
           keep_minimum_runs: 50
+      # ================= 新增步骤：防止 GitHub 自动禁用脚本 =================
+      - name: 🔄 Keepalive Workflow
+        uses: gautamkrishnar/keepalive-workflow@v2
+        with:
+          use_api: true # 使用 API 更新活跃度，不会产生无用的 commit
+      # ==================================================================
+          
